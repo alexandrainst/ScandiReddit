@@ -1,0 +1,69 @@
+[tool.poetry]
+name = "scandi_reddit"
+version = "0.0.0"
+description = "Construction of a Scandinavian Reddit dataset."
+authors = [
+    "Dan Saattrup Nielsen <dan.nielsen@alexandra.dk>",
+]
+readme = "README.md"
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.11"
+hydra-core = "^1.1.1"
+pandas = "^1.5.2"
+scikit-learn = "^1.2.0"
+datasets = "^2.7.1"
+wget = "^3.2"
+zstandard = "^0.19.0"
+luga = "^0.2.6"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0.0"
+pytest-xdist = "^2.5.0"
+pytest-cov = "^4.0.0"
+pre-commit = "^2.17.0"
+pdoc = "^7.1.1"
+black = "^22.6.0"
+isort = "^5.10.1"
+readme-coverage-badger = ">=0.1.2,<1.0.0"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = [
+    '--verbose',
+    '--durations=10',
+    '--color=yes',
+    '-s',
+    '-vv',
+    '--doctest-modules',
+    '--cov=src/scandi_reddit',
+    '-n 2',
+]
+xfail_strict = true
+filterwarnings = ["ignore"]
+log_cli_level = "info"
+testpaths = ["tests", "src/scandi_reddit"]
+
+[tool.black]
+line-length = 88
+include = '\.pyi?$'
+exclude = '''
+/(
+	\.git
+| \.hg
+| \.mypy_cache
+| \.tox
+| \.venv
+| _build
+| buck-out
+| build
+)/
+'''
+
+[tool.isort]
+profile = "black"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
