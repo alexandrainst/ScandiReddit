@@ -98,6 +98,9 @@ def build_reddit_dataset(
             # Set the starting month to 1
             starting_month = 1
 
+    # TODO: Create a new combined Scandinavian dataset and save it to the `processed`
+    # data directory
+
     # Initialise the Deduper
     deduper = Deduper(
         split_method="word_ngram",
@@ -127,12 +130,9 @@ def build_reddit_dataset(
             store_mask_to_disk=True,
         )
 
-    # TODO: Get the data entries from the original datasets which are not duplicates,
-    # and create a new combined dataset with these entries, saved in the `final` data
-    # directory
-
-    # TODO: Create a Hugging Face Dataset of the final dataset, and push it to the hub,
-    # under `alexandrainst/scandi-reddit`
+    # TODO: Filter the combined Scandinavian dataset for duplicates, convert it to a
+    # Hugging Face Dataset, store it to the `final` data directory and upload it to
+    # Hugging Face Hub under `alexandrainst/scandi-reddit`
 
 
 def extract_comments_from_file(
