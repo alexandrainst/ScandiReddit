@@ -1,15 +1,18 @@
 """Builds a Scandinavian Reddit dataset."""
 
+import json
 import logging
 from multiprocessing import cpu_count
 from pathlib import Path
+from typing import Generator, Tuple
 
 import zstandard
 from joblib import Parallel, delayed
 from tqdm.auto import tqdm
 
+from .deduplication import Deduper
 from .download import download_reddit_file
-from .filter import filter_comment
+from .language_filter import filter_comment
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -20,6 +23,7 @@ def build_reddit_dataset(
     n_jobs: int = -2,
     starting_year: int = 2005,
     starting_month: int = 1,
+    skip_download: bool = False,
 ) -> None:
     """Build a Scandinavian Reddit dataset.
 
@@ -33,18 +37,24 @@ def build_reddit_dataset(
             The year to start downloading from. Defaults to 2005.
         starting_month (int, optional):
             The month to start downloading from. Defaults to 1.
+        skip_download (bool, optional):
+            Whether to skip downloading the files. If this is set then the "data/raw"
+            directory must contain the files "reddit_da.jsonl", "reddit_no.jsonl",
+            "reddit_sv.jsonl" and "reddit_is.jsonl". Defaults to False.
     """
+    # Set up paths to data directories
+    raw_data_dir = Path("data") / "raw"
+    processed_data_dir = Path("data") / "processed"
+
+    # Set up the output files
+    output_paths = {
+        lang: processed_data_dir / f"reddit_{lang}.jsonl"
+        for lang in ["da", "sv", "no", "is"]
+    }
+
     # Ensure `n_jobs` is non-negative
     if n_jobs < 0:
         n_jobs = cpu_count() + n_jobs + 1
-
-    logger.info(f"Fetching Reddit posts using {n_jobs} jobs in parallel.")
-
-    # Set up the output files
-    raw_data_dir = Path("data") / "raw"
-    output_paths = {
-        lang: raw_data_dir / f"reddit_{lang}.jsonl" for lang in ["da", "sv", "no", "is"]
-    }
 
     # Remove the previous files if `overwrite` is set
     if overwrite:
@@ -60,28 +70,69 @@ def build_reddit_dataset(
         starting_year = max(starting_year, year)
         starting_month = max(starting_month, month)
 
-    for year in range(starting_year, 2030):
-        for month in range(starting_month, 13):
+    # Download the Reddit dumps and apply the language filter
+    if not skip_download:
 
-            # Download the file
-            input_path = download_reddit_file(year=year, month=month)
+        logger.info(f"Fetching Reddit comments using {n_jobs} jobs in parallel.")
 
-            # If the download failed then skip to the next month
-            if not input_path.exists():
-                continue
+        for year in range(starting_year, 2030):
+            for month in range(starting_month, 13):
 
-            # Extract the comments from the file
-            extract_comments_from_file(
-                input_path=input_path,
-                output_paths=output_paths,
-                n_jobs=n_jobs,
-            )
+                # Download the file
+                input_path = download_reddit_file(year=year, month=month)
 
-            # Delete the input file again
-            input_path.unlink()
+                # If the download failed then skip to the next month
+                if not input_path.exists():
+                    continue
 
-        # Set the starting month to 1
-        starting_month = 1
+                # Extract the comments from the file
+                extract_comments_from_file(
+                    input_path=input_path,
+                    output_paths=output_paths,
+                    n_jobs=n_jobs,
+                )
+
+                # Delete the input file again
+                input_path.unlink()
+
+            # Set the starting month to 1
+            starting_month = 1
+
+    # Initialise the Deduper
+    deduper = Deduper(
+        split_method="word_ngram",
+        num_minhashes=128,
+        ngram_size=5,
+        similarity_threshold=0.8,
+        n_jobs=n_jobs,
+        random_seed=4242,
+    )
+
+    # Create the corpus generator
+    def build_corpus(language: str) -> Generator[Tuple[str, str], None, None]:
+        with output_paths[language].open() as f:
+            for idx, line in enumerate(f):
+                line = json.loads(line)
+                yield f"{language}-{idx}", line["doc"]  # type: ignore[index]
+
+    # Deduplicate the files
+    for language in output_paths.keys():
+        deduper.deduplicate(
+            corpus=build_corpus(language=language),
+            output_dir=processed_data_dir / f"reddit-{language}-dedup",
+            overwrite=True,
+            store_lsh_cache_to_disk=False,
+            store_config_to_disk=False,
+            store_corpus_to_disk=False,
+            store_mask_to_disk=True,
+        )
+
+    # TODO: Get the data entries from the original datasets which are not duplicates,
+    # and create a new combined dataset with these entries, saved in the `final` data
+    # directory
+
+    # TODO: Create a Hugging Face Dataset of the final dataset, and push it to the hub,
+    # under `alexandrainst/scandi-reddit`
 
 
 def extract_comments_from_file(
@@ -118,7 +169,7 @@ def extract_comments_from_file(
 
     # Create progress bar, with unit being millions
     progress_bar = tqdm(
-        desc=f"Processing posts from {input_path.name}",
+        desc=f"Processing comments from {input_path.name}",
         unit_scale=True,
     )
 
@@ -147,12 +198,14 @@ def extract_comments_from_file(
         # Add the buffer
         batch = buffer + batch
 
-        # Split the batch into individual posts
-        posts = batch.splitlines()
+        # Split the batch into individual comments
+        comments = batch.splitlines()
 
-        # Process the posts in parallel
+        # Process the comments in parallel
         with Parallel(n_jobs=n_jobs) as parallel:
-            records = parallel(delayed(filter_comment)(post) for post in posts[:-1])
+            records = parallel(
+                delayed(filter_comment)(comment) for comment in comments[:-1]
+            )
 
         # If `records` is None then skip to the next file
         if records is None:
@@ -178,7 +231,7 @@ def extract_comments_from_file(
             progress_bar.update()
 
         # Update the buffer
-        buffer = posts[-1]
+        buffer = comments[-1]
 
     # Close the progress bar
     progress_bar.close()
@@ -189,3 +242,7 @@ def extract_comments_from_file(
 
     # Close the file
     f.close()
+
+
+if __name__ == "__main__":
+    build_reddit_dataset()
