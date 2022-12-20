@@ -49,7 +49,7 @@ def filter_comment(comment: str) -> Union[Tuple[str, str], None]:
     # If the language certainty is too low, skip the comment
     if lang.score < 0.7:
         logger.debug(
-            f"The language certainty at {lang.score:.2%} was under the 70% threshold%."
+            f"The language certainty at {lang.score:.2%} was under the 70% threshold."
         )
         return None
 
