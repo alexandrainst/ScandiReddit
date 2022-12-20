@@ -164,7 +164,8 @@ def build_reddit_dataset(
     all_records: List[Dict[str, Any]] = list()
     idx: int = 0
     for path in output_paths.values():
-        with path.open() as f:
+        path_processed = path.parent / f"{path.stem}-postprocessed.jsonl"
+        with path_processed.open() as f:
             for line in f:
                 if not mask[idx]["duplicate"]:
                     record = json.loads(line)
