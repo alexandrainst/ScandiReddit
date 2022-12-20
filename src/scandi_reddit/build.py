@@ -52,10 +52,18 @@ def build_reddit_dataset(
     processed_data_dir = Path("data") / "processed"
     final_data_dir = Path("data") / "final"
 
+    # Create language mapping
+    language_mapping = {
+        "da": "Danish",
+        "sv": "Swedish",
+        "no": "Norwegian",
+        "is": "Icelandic",
+    }
+
     # Set up the output files
     output_paths = {
         lang: processed_data_dir / f"reddit_{lang}.jsonl"
-        for lang in ["da", "sv", "no", "is"]
+        for lang in language_mapping.keys()
     }
 
     # Ensure `n_jobs` is non-negative
@@ -105,8 +113,8 @@ def build_reddit_dataset(
             starting_month = 1
 
     # Post-process the files
-    logger.info("Post-processing the files.")
-    for path in output_paths.values():
+    for lang, path in output_paths.items():
+        logger.info(f"Post-processing the {language_mapping[lang]} corpus.")
         postprocess(path=path, suffix="-postprocessed")
     breakpoint()
 
