@@ -116,7 +116,6 @@ def build_reddit_dataset(
     for lang, path in output_paths.items():
         logger.info(f"Post-processing the {language_mapping[lang]} corpus.")
         postprocess(path=path, suffix="-postprocessed")
-    breakpoint()
 
     # Initialise the Deduper
     deduper = Deduper(
