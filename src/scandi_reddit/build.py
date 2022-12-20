@@ -5,7 +5,7 @@ import logging
 import subprocess
 from multiprocessing import cpu_count
 from pathlib import Path
-from typing import Any, Dict, Generator, List, Tuple
+from typing import Any, Dict, Generator, List
 
 import pandas as pd
 import zstandard
