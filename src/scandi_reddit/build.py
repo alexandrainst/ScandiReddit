@@ -119,7 +119,6 @@ def build_reddit_dataset(
         batch_size=1_000_000,
         n_jobs=n_jobs,
         random_seed=4242,
-        overwrite=True,
         store_config_to_disk=True,
         store_mask_to_disk=True,
         store_lsh_cache_to_disk=False,
@@ -146,6 +145,7 @@ def build_reddit_dataset(
         corpus=build_corpus(),
         output_dir=processed_data_dir / "deduplicated",
         num_docs=num_docs,
+        overwrite=True,
     )
 
     # Load the deduplication mask
