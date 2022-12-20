@@ -14,71 +14,14 @@ Developers:
 - Dan Saattrup Nielsen (dan.nielsen@alexandra.dk)
 
 
-## Setup
+# Installation
 
-### Set up the environment
+The package is available on PyPI, so you can install the package using your favourite
+package manager. For instance, `pip install scandi_reddit` or `poetry add
+scandi_reddit`.
 
-1. Run `make install`, which installs Poetry (if it isn't already installed), sets up a virtual environment and all Python dependencies therein.
-2. Run `source .venv/bin/activate` to activate the virtual environment.
 
-### Install new packages
+# Quick start
 
-To install new PyPI packages, run:
-
-```
-$ poetry add <package-name>
-```
-
-### Auto-generate API documentation
-
-To auto-generate API document for your project, run:
-
-```
-$ make docs
-```
-
-To view the documentation, run:
-
-```
-$ make view-docs
-```
-
-## Tools used in this project
-* [Poetry](https://towardsdatascience.com/how-to-effortlessly-publish-your-python-package-to-pypi-using-poetry-44b305362f9f): Dependency management
-* [pre-commit plugins](https://pre-commit.com/): Automate code reviewing formatting
-* [pdoc](https://github.com/pdoc3/pdoc): Automatically create an API documentation for your project
-
-## Project structure
-```
-.
-├── .flake8
-├── .github
-│   └── workflows
-│       ├── ci.yaml
-│       └── docs.yaml
-├── .gitignore
-├── .pre-commit-config.yaml
-├── CHANGELOG.md
-├── CODE_OF_CONDUCT.md
-├── CONTRIBUTING.md
-├── LICENSE
-├── README.md
-├── data
-├── makefile
-├── models
-├── notebooks
-├── poetry.toml
-├── pyproject.toml
-├── src
-│   ├── scandi_reddit
-│   │   ├── __init__.py
-│   │   ├── build.py
-│   │   ├── cli.py
-│   │   ├── download.py
-│   │   └── language_filter.py
-│   └── scripts
-│       ├── fix_dot_env_file.py
-│       └── versioning.py
-└── tests
-    └── __init__.py
-```
+Simply run the command `build` in the terminal to build the dataset. This takes quite a
+while! See `$ build --help` for more information on all the settings.
