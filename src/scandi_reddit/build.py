@@ -44,8 +44,8 @@ def build_reddit_dataset(
             The month to start downloading from. Defaults to 1.
         skip_download (bool, optional):
             Whether to skip downloading the files. If this is set then the "data/raw"
-            directory must contain the files "reddit_da.jsonl", "reddit_no.jsonl",
-            "reddit_sv.jsonl" and "reddit_is.jsonl". Defaults to False.
+            directory must contain the files "reddit-da.jsonl", "reddit-no.jsonl",
+            "reddit-sv.jsonl" and "reddit-is.jsonl". Defaults to False.
     """
     # Set up paths to data directories
     raw_data_dir = Path("data") / "raw"
@@ -62,7 +62,7 @@ def build_reddit_dataset(
 
     # Set up the output files
     output_paths = {
-        lang: processed_data_dir / f"reddit_{lang}.jsonl"
+        lang: processed_data_dir / f"reddit-{lang}.jsonl"
         for lang in language_mapping.keys()
     }
 
