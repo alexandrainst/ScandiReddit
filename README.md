@@ -64,9 +64,6 @@ $ make view-docs
 ├── CONTRIBUTING.md
 ├── LICENSE
 ├── README.md
-├── config
-│   ├── __init__.py
-│   └── config.yaml
 ├── data
 ├── makefile
 ├── models
@@ -74,11 +71,15 @@ $ make view-docs
 ├── poetry.toml
 ├── pyproject.toml
 ├── src
-│   ├── scripts
-│   │   ├── fix_dot_env_file.py
-│   │   └── versioning.py
-│   └── scandi_reddit
-│       └── __init__.py
+│   ├── scandi_reddit
+│   │   ├── __init__.py
+│   │   ├── build.py
+│   │   ├── cli.py
+│   │   ├── download.py
+│   │   └── language_filter.py
+│   └── scripts
+│       ├── fix_dot_env_file.py
+│       └── versioning.py
 └── tests
     └── __init__.py
 ```
