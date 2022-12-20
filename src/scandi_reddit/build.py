@@ -11,7 +11,7 @@ import pandas as pd
 import zstandard
 from datasets.arrow_dataset import Dataset
 from joblib import Parallel, delayed
-from nlp_dedup.deduper import Deduper
+from nlp_dedup import Deduper
 from tqdm.auto import tqdm
 
 from scandi_reddit.postprocess import postprocess
