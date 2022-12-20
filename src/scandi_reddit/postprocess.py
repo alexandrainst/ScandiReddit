@@ -125,6 +125,7 @@ def remove_inappropriate_comments(corpus: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Train the model
+    logger.info("Training classifier to detect inappropriate comments.")
     clf.fit(train.doc, train.label)
 
     # Evaluate the model on the test set
