@@ -2,15 +2,18 @@
 
 import json
 import logging
+import subprocess
 from multiprocessing import cpu_count
 from pathlib import Path
-from typing import Generator, Tuple
+from typing import Any, Dict, Generator, List, Tuple
 
+import pandas as pd
 import zstandard
+from datasets.arrow_dataset import Dataset
 from joblib import Parallel, delayed
+from nlp_dedup import Deduper
 from tqdm.auto import tqdm
 
-from .deduplication import Deduper
 from .download import download_reddit_file
 from .language_filter import filter_comment
 
@@ -45,6 +48,7 @@ def build_reddit_dataset(
     # Set up paths to data directories
     raw_data_dir = Path("data") / "raw"
     processed_data_dir = Path("data") / "processed"
+    final_data_dir = Path("data") / "final"
 
     # Set up the output files
     output_paths = {
@@ -98,41 +102,68 @@ def build_reddit_dataset(
             # Set the starting month to 1
             starting_month = 1
 
-    # TODO: Create a new combined Scandinavian dataset and save it to the `processed`
-    # data directory
-
     # Initialise the Deduper
     deduper = Deduper(
         split_method="word_ngram",
         num_minhashes=128,
         ngram_size=5,
         similarity_threshold=0.8,
+        batch_size=1_000_000,
         n_jobs=n_jobs,
         random_seed=4242,
+        overwrite=True,
+        store_config_to_disk=True,
+        store_mask_to_disk=True,
+        store_lsh_cache_to_disk=False,
+        store_corpus_to_disk=False,
     )
 
     # Create the corpus generator
-    def build_corpus(language: str) -> Generator[Tuple[str, str], None, None]:
-        with output_paths[language].open() as f:
-            for idx, line in enumerate(f):
-                line = json.loads(line)
-                yield f"{language}-{idx}", line["doc"]  # type: ignore[index]
+    def build_corpus() -> Generator[str, None, None]:
+        for path in output_paths.values():
+            with path.open() as f:
+                for line in f:
+                    line = json.loads(line)
+                    yield line["doc"]  # type: ignore[index]
+
+    # Count the lines in the corpus
+    num_docs = 0
+    for path in output_paths.values():
+        proc = subprocess.Popen(["wc", "-l", str(path)], stdout=subprocess.PIPE)
+        num_docs += int(proc.communicate()[0].decode().split()[0])
 
     # Deduplicate the files
-    for language in output_paths.keys():
-        deduper.deduplicate(
-            corpus=build_corpus(language=language),
-            output_dir=processed_data_dir / f"reddit-{language}-dedup",
-            overwrite=True,
-            store_lsh_cache_to_disk=False,
-            store_config_to_disk=False,
-            store_corpus_to_disk=False,
-            store_mask_to_disk=True,
-        )
+    deduper.deduplicate(
+        corpus=build_corpus(),
+        output_dir=processed_data_dir / "deduplicated",
+        num_docs=num_docs,
+    )
 
-    # TODO: Filter the combined Scandinavian dataset for duplicates, convert it to a
-    # Hugging Face Dataset, store it to the `final` data directory and upload it to
-    # Hugging Face Hub under `alexandrainst/scandi-reddit`
+    # Load the deduplication mask
+    mask_path = processed_data_dir / "deduplicated" / "mask.jsonl"
+    with mask_path.open() as f:
+        mask = [json.loads(line) for line in f]
+
+    # Load all the deduplicated files
+    all_records: List[Dict[str, Any]] = list()
+    idx: int = 0
+    for path in output_paths.values():
+        with path.open() as f:
+            for line in f:
+                if not mask[idx]["duplicate"]:
+                    record = json.loads(line)
+                    all_records.append(record)
+                idx += 1
+
+    # Convert the records to a Hugging Face dataset
+    df = pd.DataFrame.from_records(all_records)
+    dataset = Dataset.from_pandas(df)
+
+    # Save the dataset to disk
+    dataset.save_to_disk(str(final_data_dir / "scandi-reddit"))
+
+    # Push the dataset to the Hugging Face Hub
+    dataset.push_to_hub(repo_id="alexandrainst/scandi-reddit", private=True)
 
 
 def extract_comments_from_file(
