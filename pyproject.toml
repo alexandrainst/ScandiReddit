@@ -19,6 +19,7 @@ zstandard = "^0.19.0"
 luga = "^0.2.6"
 datasketch = "^1.5.8"
 more-itertools = "^9.0.0"
+nlp-dedup = "^0.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.0.0"

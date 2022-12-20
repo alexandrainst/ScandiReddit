@@ -537,6 +537,20 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "nlp-dedup"
+version = "0.1.0"
+description = "Remove duplicates and near-duplicates from text corpora, no matter the scale."
+category = "main"
+optional = false
+python-versions = ">=3.8,<3.11"
+
+[package.dependencies]
+datasketch = ">=1.5.8,<2.0.0"
+joblib = ">=1.2.0,<2.0.0"
+more-itertools = ">=9.0.0,<10.0.0"
+tqdm = ">=4.64.1,<5.0.0"
+
+[[package]]
 name = "nodeenv"
 version = "1.7.0"
 description = "Node.js virtual environment builder"
@@ -1092,7 +1106,7 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.11"
-content-hash = "dfc12ce2ad4a27f52a2370640571cb293ba73d68152526aca5182f1223ca146f"
+content-hash = "b1e94cc3c1b834ae47f5ecf204b3e7067fdc70f3e8ab10dc5412058a5822dfd5"
 
 [metadata.files]
 aiohttp = [
@@ -1754,6 +1768,10 @@ multiprocess = [
 mypy-extensions = [
     {file = "mypy_extensions-0.4.3-py2.py3-none-any.whl", hash = "sha256:090fedd75945a69ae91ce1303b5824f428daf5a028d2f6ab8a299250a846f15d"},
     {file = "mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
+]
+nlp-dedup = [
+    {file = "nlp_dedup-0.1.0-py3-none-any.whl", hash = "sha256:7452ef9925b8a78f76238cdbe5e1b329301bfb1cc43e36797125b71df0eb5811"},
+    {file = "nlp_dedup-0.1.0.tar.gz", hash = "sha256:df69711e691b2ccb1ebad331cf21769054d88a8f4d0fb2688d02cd1386e58b6f"},
 ]
 nodeenv = [
     {file = "nodeenv-1.7.0-py2.py3-none-any.whl", hash = "sha256:27083a7b96a25f2f5e1d8cb4b6317ee8aeda3bdd121394e5ac54e498028a042e"},
