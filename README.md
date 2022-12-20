@@ -3,10 +3,10 @@
 Construction of a Scandinavian Reddit dataset.
 
 ______________________________________________________________________
-[![Documentation](https://img.shields.io/badge/docs-passing-green)](https://alexandrainst.github.io/scandi_reddit/scandi_reddit.html)
-[![License](https://img.shields.io/github/license/alexandrainst/scandi_reddit)](https://github.com/alexandrainst/scandi_reddit/blob/main/LICENSE)
-[![LastCommit](https://img.shields.io/github/last-commit/alexandrainst/scandi_reddit)](https://github.com/alexandrainst/scandi_reddit/commits/main)
-[![Code Coverage](https://img.shields.io/badge/Coverage-0%25-red.svg)](https://github.com/alexandrainst/scandi_reddit/tree/main/tests)
+[![Documentation](https://img.shields.io/badge/docs-passing-green)](https://alexandrainst.github.io/ScandiReddit/scandi_reddit.html)
+[![License](https://img.shields.io/github/license/alexandrainst/ScandiReddit)](https://github.com/alexandrainst/ScandiReddit/blob/main/LICENSE)
+[![LastCommit](https://img.shields.io/github/last-commit/alexandrainst/ScandiReddit)](https://github.com/alexandrainst/ScandiReddit/commits/main)
+[![Code Coverage](https://img.shields.io/badge/Coverage-0%25-red.svg)](https://github.com/alexandrainst/ScandiReddit/tree/main/tests)
 
 
 Developers:
