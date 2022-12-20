@@ -10,7 +10,6 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"
-hydra-core = "^1.1.1"
 pandas = "^1.5.2"
 scikit-learn = "^1.2.0"
 datasets = "^2.7.1"
