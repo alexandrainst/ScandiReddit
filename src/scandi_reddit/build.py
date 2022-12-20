@@ -11,8 +11,10 @@ import pandas as pd
 import zstandard
 from datasets.arrow_dataset import Dataset
 from joblib import Parallel, delayed
-from nlp_dedup import Deduper
+from nlp_dedup.deduper import Deduper
 from tqdm.auto import tqdm
+
+from scandi_reddit.postprocess import postprocess
 
 from .download import download_reddit_file
 from .language_filter import filter_comment
@@ -102,6 +104,12 @@ def build_reddit_dataset(
             # Set the starting month to 1
             starting_month = 1
 
+    # Post-process the files
+    logger.info("Post-processing the files.")
+    for path in output_paths.values():
+        postprocess(path=path, suffix="-postprocessed")
+    breakpoint()
+
     # Initialise the Deduper
     deduper = Deduper(
         split_method="word_ngram",
@@ -121,7 +129,8 @@ def build_reddit_dataset(
     # Create the corpus generator
     def build_corpus() -> Generator[str, None, None]:
         for path in output_paths.values():
-            with path.open() as f:
+            path_processed = path.parent / f"{path.stem}-postprocessed.jsonl"
+            with path_processed.open() as f:
                 for line in f:
                     line = json.loads(line)
                     yield line["doc"]  # type: ignore[index]
