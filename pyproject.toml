@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "scandi_reddit"
-version = "0.2.0"
+version = "0.2.1"
 description = "Construction of a Scandinavian Reddit dataset."
 authors = [
     "Dan Saattrup Nielsen <dan.nielsen@alexandra.dk>",
