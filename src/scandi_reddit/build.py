@@ -296,7 +296,3 @@ def extract_comments_from_file(
 
     # Close the file
     f.close()
-
-
-if __name__ == "__main__":
-    build_reddit_dataset()
