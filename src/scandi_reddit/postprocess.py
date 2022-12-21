@@ -4,11 +4,9 @@ import json
 import logging
 import re
 from pathlib import Path
-from typing import Union
+from typing import List, Union
 
 import pandas as pd
-
-from .utils import DRUG_SUBREDDITS, NSFW_SUBREDDITS
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -55,14 +53,63 @@ def postprocess(path: Union[str, Path], suffix: str = "-postprocessed") -> None:
 
     # Remove the inappropriate comments
     prev_count = len(corpus)
-    banned_subreddits = NSFW_SUBREDDITS + DRUG_SUBREDDITS
+    banned_subreddits = get_banned_subreddits(
+        corpus.subreddit.unique()
+    )  # NSFW_SUBREDDITS + DRUG_SUBREDDITS
     corpus = corpus[~corpus.subreddit.isin(banned_subreddits)]
-    logger.info(
-        f"Removed {prev_count - len(corpus):,} comments from banned subreddits."
-    )
+    logger.info(f"Removed {prev_count - len(corpus):,} inappropriate comments.")
 
     # Save the corpus
     output_path = path.parent / f"{path.stem}{suffix}.jsonl"
     with output_path.open("w") as f:
         for _, row in corpus.iterrows():
             f.write(json.dumps(row.to_dict()) + "\n")
+
+
+def get_banned_subreddits(subreddits: List[str]) -> List[str]:
+    """Check if a list of subreddits are banned.
+
+    Args:
+        subreddits (List[str]):
+            The list of subreddits to check.
+
+    Returns:
+        List[str]:
+            The list of banned subreddits.
+
+    Raises:
+        ValueError:
+            If the list of subreddits is empty.
+    """
+    banned_words = [
+        "nsfw",
+        "gonewild",
+        "cock" "tits" "titties",
+        "milf",
+        "porn",
+        "dirty",
+        "fraek",
+        "nipple",
+        "trusse",
+        "buksebule",
+        "rape",
+        "jodel",
+        "weed",
+        "drugs",
+        "droger",
+        "stoffer",
+        "darknet",
+        "sortemarked",
+        "psyches",
+        "rusmidler",
+        "naket",
+    ]
+
+    # Filter the subreddits
+    banned_subreddits = [
+        subreddit
+        for subreddit in subreddits
+        if any(keyword in subreddit.lower() for keyword in banned_words)
+    ]
+
+    return banned_subreddits
