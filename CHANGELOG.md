@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 
+## [Unreleased]
+### Fixed
+- Some of the banned words were not banned correctly - these are now correctly removed.
+
+
 ## [v0.2.0] - 2022-12-21
 ### Added
 - Added postprocessing of corpora, including removal of duplicates, bot comments, and
