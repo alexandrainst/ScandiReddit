@@ -53,9 +53,7 @@ def postprocess(path: Union[str, Path], suffix: str = "-postprocessed") -> None:
 
     # Remove the inappropriate comments
     prev_count = len(corpus)
-    banned_subreddits = get_banned_subreddits(
-        corpus.subreddit.unique()
-    )  # NSFW_SUBREDDITS + DRUG_SUBREDDITS
+    banned_subreddits = get_banned_subreddits(corpus.subreddit.unique())
     corpus = corpus[~corpus.subreddit.isin(banned_subreddits)]
     logger.info(f"Removed {prev_count - len(corpus):,} inappropriate comments.")
 
