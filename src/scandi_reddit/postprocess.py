@@ -84,7 +84,9 @@ def get_banned_subreddits(subreddits: List[str]) -> List[str]:
     banned_words = [
         "nsfw",
         "gonewild",
-        "cock" "tits" "titties",
+        "cock",
+        "tits",
+        "titties",
         "milf",
         "porn",
         "dirty",
