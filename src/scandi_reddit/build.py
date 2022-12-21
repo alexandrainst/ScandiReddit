@@ -5,7 +5,7 @@ import logging
 import subprocess
 from multiprocessing import cpu_count
 from pathlib import Path
-from typing import Any, Dict, Generator, List
+from typing import Any, Dict, Generator, List, Optional
 
 import pandas as pd
 import zstandard
@@ -29,6 +29,7 @@ def build_reddit_dataset(
     starting_year: int = 2005,
     starting_month: int = 1,
     skip_download: bool = False,
+    hub_repo_id: Optional[str] = None,
 ) -> None:
     """Build a Scandinavian Reddit dataset.
 
@@ -46,6 +47,10 @@ def build_reddit_dataset(
             Whether to skip downloading the files. If this is set then the "data/raw"
             directory must contain the files "reddit-da.jsonl", "reddit-no.jsonl",
             "reddit-sv.jsonl" and "reddit-is.jsonl". Defaults to False.
+        hub_repo_id (Optional[str], optional):
+            The ID of the Hugging Face Hub repository to upload the dataset to. If
+            this is set then the dataset will be uploaded to the Hugging Face Hub.
+            If None then the dataset will not be uploaded. Defaults to None.
     """
     # Set up paths to data directories
     raw_data_dir = Path("data") / "raw"
@@ -177,10 +182,11 @@ def build_reddit_dataset(
     dataset = Dataset.from_pandas(df)
 
     # Save the dataset to disk
-    dataset.save_to_disk(str(final_data_dir / "scandi-reddit"))
+    dataset.save_to_disk(str(final_data_dir / "scandireddit"))
 
     # Push the dataset to the Hugging Face Hub
-    dataset.push_to_hub(repo_id="alexandrainst/scandi-reddit", private=True)
+    if hub_repo_id is not None:
+        dataset.push_to_hub(hub_repo_id)
 
 
 def extract_comments_from_file(

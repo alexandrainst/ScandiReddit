@@ -10,6 +10,8 @@ project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 ### Added
 - Added postprocessing of corpora, including removal of duplicates, bot comments, and
   removing comments from inappropriate subreddits.
+- Added `--hub-repo-id` to the CLI, which can be used to upload the resulting dataset
+  to the Hugging Face Hub.
 
 
 ## [v0.1.0] - 2022-12-20

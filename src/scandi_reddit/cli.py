@@ -1,5 +1,7 @@
 """Command line interface for creating a Scandinavian Reddit dataset."""
 
+from typing import Optional
+
 import click
 
 from .build import build_reddit_dataset
@@ -35,12 +37,18 @@ from .build import build_reddit_dataset
     default=False,
     help="Whether to skip downloading the files.",
 )
+@click.option(
+    "--hub-repo-id",
+    default=None,
+    help="The ID of the Hugging Face Hub repository to upload the dataset to.",
+)
 def main(
     overwrite: bool,
     n_jobs: int,
     starting_year: int,
     starting_month: int,
     skip_download: bool,
+    hub_repo_id: Optional[str],
 ) -> None:
     """Build a Scandinavian Reddit dataset."""
     build_reddit_dataset(
@@ -49,6 +57,7 @@ def main(
         starting_year=starting_year,
         starting_month=starting_month,
         skip_download=skip_download,
+        hub_repo_id=hub_repo_id,
     )
 
 
